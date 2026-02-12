@@ -1,7 +1,7 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const path = require("path");
-const data = require("data-service.js");
+const data = require("./data-service");
 
 const app = express();
 dotenv.config();
@@ -24,17 +24,40 @@ app.get("/about", (req, res) => {
 
 // employees route
 app.get("/employees", (req, res) => {
-  res.send("Employees route");
+  data
+    .getAllEmployees()
+    .then((data) => {
+      res.json(data);
+    })
+    .catch((err) => {
+      res.json({ message: err });
+    });
+
+  // res.send("Hello");
 });
 
 // managers route
 app.get("/managers", (req, res) => {
-  res.send("Managers route");
+  data
+    .getManagers()
+    .then((data) => {
+      res.json(data);
+    })
+    .catch((err) => {
+      res.json({ message: err });
+    });
 });
 
 // departments route
 app.get("/departments", (req, res) => {
-  res.send("Departments route");
+  data
+    .getDepartments()
+    .then((data) => {
+      res.json(data);
+    })
+    .catch((err) => {
+      res.json({ message: err });
+    });
 });
 
 // 404 error handler for undefined routes
@@ -43,7 +66,14 @@ app.use((req, res) => {
 });
 
 // setup server
-app.listen(HTTP_PORT, () => {
-  console.log(`App listening on port: ${HTTP_PORT}`);
-});
+data
+  .initialize()
+  .then(function () {
+    app.listen(HTTP_PORT, function () {
+      console.log(`App listening on port: ${HTTP_PORT}`);
+    });
+  })
+  .catch(function (err) {
+    console.log(`Unable to start server: ${err}`);
+  });
 
